@@ -70,8 +70,7 @@ public class SellerDaoJDBC implements SellerDao {
             st = conn.prepareStatement(
                     "UPDATE seller "
                             + "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? "
-                            + "WHERE Id = ?",
-                    Statement.RETURN_GENERATED_KEYS);
+                            + "WHERE Id = ?");
 
             st.setString(1, obj.getName());
             st.setString(2, obj.getEmail());
@@ -91,8 +90,26 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void deleteById(Integer id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        PreparedStatement st = null;
+
+        try {
+            st = conn.prepareStatement(
+                    "DELETE FROM seller "
+                            + "WHERE Id = ?");
+
+            st.setInt(1, id);
+
+            int rowsAffected = st.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new DbException("Nenhum id foi encontrado!");
+            }
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+        }
     }
 
     @Override
